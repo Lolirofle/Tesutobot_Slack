@@ -1,6 +1,6 @@
-build/*
-dist/*
+*build
+*dist
 SLACK_TOKEN
 main.spec
 main.log
-__pycache__/*
+*__pycache__
