@@ -1,1 +1,4 @@
+build/*
+dist/*
 SLACK_TOKEN
+main.spec
