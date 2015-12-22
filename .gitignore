@@ -2,3 +2,4 @@ build/*
 dist/*
 SLACK_TOKEN
 main.spec
+main.log
