@@ -6,6 +6,7 @@ import threading
 import urllib
 import websocket
 
+import morse
 from user_util import *
 import wikipedia
 
@@ -129,10 +130,12 @@ class Server(object):
 				length  = max(min(int(args[0]),10),3) if argn>0 else 6
 				exclude = set(args[1]) if argn>1 else set()
 			except:
-				length  = 6
-				exclude = set()
+				return False
 
 			self.message_reply(message,resurrected_name_gen.generate_name(length,exclude).title())
+			return True
+		def to_morse(arg):
+			self.message_reply(message,"```"+morse.convert(arg)+"```")
 			return True
 
 		# List of commands
@@ -151,6 +154,7 @@ class Server(object):
 			'wiki'      : wikipedia_summary,
 			'google'    : google_ifeellucky,
 			'namn'      : generate_name,
+			'morse'     : to_morse,
 		}
 
 		# If the command is defined

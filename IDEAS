@@ -2,11 +2,8 @@ Användarspecifika sessioner
 	T.ex. väntar på bekräftelse: "Ja eller nej?"
 	Svar: "...", "Okej, var sådan då."
 Slumpar citat från det folk har sagt förr
-Namn-/ordgenerator
 Textbaserade spel (T.ex. hänga gubbe)
 Kommandon med hjälp av fin syntax
 	@tesutobot: calc 1+2
 Skriva "Är något på tok?"/"Är det dags igen?" när man börjar skriva privat meddelande till den
-sup -> sup
-help -> Kan inte hjälpa dig
-*? -> Vet inte/Kanske/Relativt
+Lagring av data (@tesutobot data x=5 -> OK) (@tesutobot data x -> 5)

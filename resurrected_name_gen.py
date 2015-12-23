@@ -1,44 +1,45 @@
 import random
 
+# Potential next character for each character
+combinations = {
+	'q': set('wylujöåarhneioäv'),
+	'f': set('fyluöåarheioä'),
+	'p': set('pylujöåarheioä'),
+	'g': set('wgylujöåarhneioäzv'),
+	'y': set('qwfpglrstdhnzxvbkm'),
+	'l': set('luöåaheioä'),
+	'u': set('qwfpgyljrstdhnzxvbkm'),
+	'j': set('yuöåaeioä'),
+	'ö': set('fpglrstdhnzxvbkm'),
+	'å': set('fpgljrstdhnzxcvbkm'),
+	'a': set('qfpgljrstdnizxcvbkm'),
+	'r': set('yuöåarheioä'),
+	's': set('wyluöåasthneioäcvm'),
+	't': set('wyuöåartheioäv'),
+	'd': set('wyuöåardheioäv'),
+	'h': set('yujöåaeioä'),
+	'n': set('yuöåahneioä'),
+	'e': set('wfpgljrstdnizxcvbkm'),
+	'i': set('qwfpgljrstdnezxcvbkm'),
+	'o': set('qwfpgylujrstdhnzxcvbkm'),
+	'ä': set('pgylrstdnvkm'),
+	'z': set('wluöåathneioäv'),
+	'x': set('uaeio'),
+	'c': set('wyuarheioc'),
+	'v': set('yuöåarheioä'),
+	'b': set('yuöåarheioäb'),
+	'k': set('yluöåarhneioäv'),
+	'm': set('yujöåahneioäm'),
+	'w': set('uaheio'),
+}
+
+# Other data
+initial    = set('wfpgylujarstdhneiocvbkm')
+vowels     = set('aoueiyåäö')
+consonants = set('qwrtpsdfghjklzxcvbnm')
+
 def generate_name(length=6,exclude=set()):
 	try:
-		# Potential next character for each character
-		combinations = {
-			'q': set('wylujöåarhneioäv'),
-			'f': set('fyluöåarheioä'),
-			'p': set('pylujöåarheioä'),
-			'g': set('wgylujöåarhneioäzv'),
-			'y': set('qwfpglrstdhnzxvbkm'),
-			'l': set('luöåaheioä'),
-			'u': set('qwfpgyljrstdhnzxvbkm'),
-			'j': set('yuöåaeioä'),
-			'ö': set('fpglrstdhnzxvbkm'),
-			'å': set('fpgljrstdhnzxcvbkm'),
-			'a': set('qfpgljrstdnizxcvbkm'),
-			'r': set('yuöåarheioä'),
-			's': set('wyluöåasthneioäcvm'),
-			't': set('wyuöåartheioäv'),
-			'd': set('wyuöåardheioäv'),
-			'h': set('yujöåaeioä'),
-			'n': set('yuöåahneioä'),
-			'e': set('wfpgljrstdnizxcvbkm'),
-			'i': set('qwfpgljrstdnezxcvbkm'),
-			'o': set('qwfpgylujrstdhnzxcvbkm'),
-			'ä': set('pgylrstdnvkm'),
-			'z': set('wluöåathneioäv'),
-			'x': set('uaeio'),
-			'c': set('wyuarheioc'),
-			'v': set('yuöåarheioä'),
-			'b': set('yuöåarheioäb'),
-			'k': set('yluöåarhneioäv'),
-			'm': set('yujöåahneioäm'),
-			'w': set('uaheio'),
-		}
-
-		initial    = set('wfpgylujarstdhneiocvbkm')
-		vowels     = set('aoueiyåäö')
-		consonants = set('qwrtpsdfghjklzxcvbnm')
-
 		# First character
 		name = random.choice(list(initial.difference(exclude)))
 
