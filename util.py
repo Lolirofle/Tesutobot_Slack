@@ -23,3 +23,6 @@ def string_split_when(predicate,string):
 			if not predicate(c):
 				return (string[:i1],string[i:])
 	return (string if i1==None else string[:i1],"")
+
+def string_char_translate(text,table):
+	return ' '.join(map(lambda c: table[c] if c in table else c,text))

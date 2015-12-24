@@ -1,4 +1,4 @@
-morse_table = {
+table = {
 	'A': "·−",
 	'B': "−···",
 	'C': "−·−·",
@@ -86,6 +86,3 @@ morse_table = {
 	' ': "  ",
 	'\n': "    ",
 }
-
-def convert(text):
-	return ' '.join(map(lambda c: morse_table[c] if c in morse_table else c,text.upper()))

@@ -1,6 +1,7 @@
 *build
 *dist
 SLACK_TOKEN
+VASTTRAFIK_ID
 main.spec
 main.log
 *__pycache__

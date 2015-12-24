@@ -12,6 +12,7 @@ class Server(bot.TesutoBot):
 		self.users = {}
 		self.channels = {}
 		self.connected = False
+		self.on_init()
 
 	def rtm_connect(self):
 		""" Connects using the Real Time Messaging method """

@@ -6,4 +6,11 @@ Textbaserade spel (T.ex. hänga gubbe)
 Kommandon med hjälp av fin syntax
 	@tesutobot: calc 1+2
 Skriva "Är något på tok?"/"Är det dags igen?" när man börjar skriva privat meddelande till den
-Lagring av data (@tesutobot data x=5 -> OK) (@tesutobot data x -> 5)
+Anteckningar genom lagring av data (@tesutobot data x=5 -> OK) (@tesutobot data x -> 5)
+Alarm/påminnelser/timer
+Intervallräkning mellan tider/datum
+Vädret
+Tid på en tidszon
+Urban dictionary
+Röstning
+Hänga gubbe med ord som har skrivits i chatten

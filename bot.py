@@ -1,11 +1,15 @@
+import datetime
 import random
 import requests
 import threading
+import traceback
 import urllib
 
+import hangman
 import morse
 import resurrected_name_gen
 import util
+import vasttrafik
 import wikipedia
 
 # Username: tesutobot
@@ -17,8 +21,25 @@ class TesutoBot(object):
 	''' Abstract class/mixin, implementing a number of methods '''
 
 	def message_reply(self,message,text):
-		''' A simple reply to a message from an user '''
+		'''
+		A simple reply to a message from an user.
+		Implemented by a client.
+		'''
 		raise NotImplementedError
+
+	def on_init(self):
+		# Vasttrafik initialization
+		def read_file():
+			with open('VASTTRAFIK_ID','r') as f:
+				return f.read().replace('\n','')
+		try:
+			self.vasttrafik = vasttrafik.Vasttrafik(read_file)
+		except Exception as e:
+			self.vasttrafik = e
+			traceback.print_tb(e.__traceback__)
+
+		# Hangman initialization
+		self.hangman = None
 
 	def on_message(self,message,text):
 		# Test whether the message is a command
@@ -33,7 +54,7 @@ class TesutoBot(object):
 				self.message_reply(message,text+"? "+random.choice(["Okej","mm","ok","Jaså?","bra"]))
 
 	def on_private_message(self,message):
-		self.message_reply(message,"Okej")
+		self.on_message(message,message['text'])
 
 	def on_command(self,message,command,arg):
 		# Command definitions
@@ -80,26 +101,121 @@ class TesutoBot(object):
 			self.message_reply(message,resurrected_name_gen.generate_name(length,exclude).title())
 			return True
 		def to_morse(arg):
-			self.message_reply(message,"```"+morse.convert(arg)+"```")
+			self.message_reply(message,"```"+util.string_char_translate(arg.upper(),morse.table)+"```")
+			return True
+		def full_datetime(arg):
+			self.message_reply(message,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S\n*%A* v %W*, dag *%j* på året"))
+			return True
+		def dice(arg):
+			if arg:
+				args = arg.split(" ")
+				argn = len(args)
+			else:
+				argn = 0
+
+			try:
+				count = max(min(int(args[0]),10),1) if argn>0 else 1
+				faces = max(min(int(args[1]),100000),1) if argn>1 else 6
+			except:
+				return False
+
+			dices = [random.randint(1,faces) for i in range(count)]
+			self.message_reply(message,"*"+str(sum(dices))+"* / "+str(count*faces)+" : ["+("] [".join(map(str,dices)))+"]")
+			return True
+		def vasttrafik_hallplats(arg):
+			if isinstance(self.vasttrafik,Exception):
+				self.message_reply(message,"Kan inte nu, tyvärr. %s hände." % type(self.vasttrafik).__name__)
+				return true
+
+			def map_departure(departure):
+				if 'rtDate' in departure and 'rtTime' in departure:
+					time   = datetime.datetime.strptime("%s %s" % (departure['date']  ,departure['time']  ),'%Y-%m-%d %H:%M')
+					rtTime = datetime.datetime.strptime("%s %s" % (departure['rtDate'],departure['rtTime']),'%Y-%m-%d %H:%M')
+					timeDelta = (rtTime-time).total_seconds()/60
+					timeString = ('%s ±%-3d' if timeDelta==0 else '%s %-+4d') % (departure['time'],timeDelta)
+				else:
+					timeString = "%s(?) " % departure['time']
+
+				return "%s: [%s] %s (Läge %s)" % (
+					timeString,
+					departure['name'],
+					departure['direction'],
+					departure['rtTrack'] if 'rtTrack' in departure else departure['track']
+				)
+			try:
+				location = self.vasttrafik.location(arg.lower().strip().replace(' ','_'))
+				self.message_reply(message,"Hållplats *%s*\n```%s```" % (location['name'],"\n".join(map(map_departure,self.vasttrafik.departures(location['id'],datetime.datetime.now())))))
+			except Exception as e:
+				self.message_reply(message,"Förväntade mig att få en tidtabell på hållplatsen, men fick istället en %s" % (type(e).__name__,))
+			return True
+		def hangman_game(arg):
+			(subcommand,arg) = util.string_split_when(lambda c: c.isspace(),arg)
+			if subcommand=='guess':
+				if self.hangman==None:
+					self.message_reply(message,"Kör inget. Vill spela, eller?")
+				else:
+					if arg:
+						if arg[0].isalpha():
+							try:
+								has_won = self.hangman.guess_char(arg[0].lower())
+								self.message_reply(message,"```%s```" % str(self.hangman))
+								if has_won:
+									self.hangman = None
+							except hangman.GameOverError:
+								self.message_reply(message,"Tyvärr, det var: %s" % self.hangman.word)
+								self.hangman = None
+						else:
+							self.message_reply(message,"Kan bara gissa med bokstäver ur alfabetet!")
+					else:
+						self.message_reply(message,"Ingen gissning?")
+			elif subcommand=='new':
+				self.hangman = hangman.Hangman(arg.lower() if arg else "test")
+				self.message_reply(message,"```%s```" % str(self.hangman))
+			elif subcommand=='show' or subcommand=='state':
+				self.message_reply(message,"```%s```" % str(self.hangman))
+			elif subcommand=='reveal':
+				if self.hangman==None:
+					self.message_reply(message,"Kör inget. Vill spela, eller?")
+				else:
+					self.hangman.reveal()
+					self.message_reply(message,"```%s```" % str(self.hangman))
+					self.hangman = None
+			else:
+				self.message_reply(message,"*Möjliga kommandon för hänga gubbe:*\nguess, new, reveal, show|state, help|?")
+				# https://sv.wiktionary.org/wiki/Special:RandomInCategory/Svenska/(Alla_uppslag|Adverb|Adjektiv|Verb|Substantiv)
 			return True
 
 		# List of commands
 		commands = {
-			'help'      : help,
-			'choice'    : choice,
-			'choose'    : choice,
-			'välj'      : choice,
-			'eller'     : lambda arg: choice("Ja,Nej"),
-			'bool'      : lambda arg: choice("Ja,Nej"),
-			'fel'       : lambda arg: False,
-			'false'     : lambda arg: False,
-			'vad'       : lambda arg: echo(", ".join(commands.keys())),
-			'kommandon' : lambda arg: echo(", ".join(commands.keys())),
-			'säg'       : echo,
-			'wiki'      : wikipedia_summary,
-			'google'    : google_ifeellucky,
-			'namn'      : generate_name,
-			'morse'     : to_morse,
+			'help'         : help,
+			'choice'       : choice,
+			'choose'       : choice,
+			'välj'         : choice,
+			'eller'        : lambda arg: choice("Ja,Nej"),
+			'bool'         : lambda arg: choice("Ja,Nej"),
+			'fel'          : lambda arg: False,
+			'false'        : lambda arg: False,
+			'vad'          : lambda arg: echo(", ".join(commands.keys())),
+			'kommandon'    : lambda arg: echo(", ".join(commands.keys())),
+			'säg'          : echo,
+			'wiki'         : wikipedia_summary,
+			'google'       : google_ifeellucky,
+			'namn'         : generate_name,
+			'morse'        : to_morse,
+			'yt'           : lambda arg: echo("<https://www.youtube.com/results?search_query="+urllib.parse.quote(arg)+"|Search: *"+arg+"* - YouTube>"),
+			'date'         : full_datetime,
+			'time'         : full_datetime,
+			'datum'        : full_datetime,
+			'tid'          : full_datetime,
+			'dice'         : dice,
+			'roll'         : dice,
+			'tärning'      : dice,
+			'baklänges'    : lambda arg: echo(arg[::-1]),
+			'ord-baklänges': lambda arg: echo(" ".join(arg.split(" ")[::-1])),
+			'hangman'      : hangman_game,
+			'hållplats'    : vasttrafik_hallplats,
+			'bussar'       : vasttrafik_hallplats,
+			'spårvagnar'   : vasttrafik_hallplats,
 		}
 
 		# If the command is defined
