@@ -36,7 +36,7 @@ class Server(bot.TesutoBot):
 			raise SlackNotConnectedError
 
 		# Cache
-		self_id = "<@"+self.data['self']['id']+">"
+		self_id = "<@%s>" % (self.data['self']['id'],)
 		self_name = self.data['self']['name']
 		self_id_len = len(self_id)
 		self_name_len = len(self_name)
@@ -69,7 +69,7 @@ class Server(bot.TesutoBot):
 		if message['channel'].startswith("D"):
 			self.slack.chat.post_message(message['channel'],text,as_user=True)
 		else:
-			self.slack.chat.post_message(message['channel'],"<@"+message['user']+">: "+text,as_user=True)
+			self.slack.chat.post_message(message['channel'],"<@%s>: %s" % (message['user'],text),as_user=True)
 
 class SlackNotConnectedError(Exception):
 	pass

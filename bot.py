@@ -51,7 +51,7 @@ class TesutoBot(object):
 				self.message_reply(message,random.choice(["Vet inte","Relativt","Hmm..","Beror på","...","Sluta","Var inte sådan nu"]))
 			else:
 				# Comments on stuff that can be said
-				self.message_reply(message,text+"? "+random.choice(["Okej","mm","ok","Jaså?","bra"]))
+				self.message_reply(message,"%s? %s" % (text,random.choice(["Okej","mm","ok","Jaså?","bra"])))
 
 	def on_private_message(self,message):
 		self.on_message(message,message['text'])
@@ -71,9 +71,9 @@ class TesutoBot(object):
 			def thread():
 				try:
 					(page,text) = wikipedia.summary(arg,3,auto_suggest=True,redirect=True)
-					self.message_reply(message,"<"+page.url+"|*"+page.title+"* - Wikipedia>\n>>>"+text+"..")
+					self.message_reply(message,"<%s|*%s* - Wikipedia>\n>>>%s.." % (page.url,page.title,text))
 				except wikipedia.DisambiguationError as e:
-					self.message_reply(message,random.choice(["Tvetydigt","Var tydligare!","Vilket menar du?"])+"\n>>>"+str(e))
+					self.message_reply(message,"%s\n>>>%s" % (random.choice(["Tvetydigt","Var tydligare!","Vilket menar du?"]),str(e)))
 				except wikipedia.PageError:
 					self.message_reply(message,random.choice(["En sådan artikel existerar inte!","Det där.. kunde inte hittas","Säker på att det där ens existerar?"]))
 				except:
@@ -83,7 +83,7 @@ class TesutoBot(object):
 		def google_ifeellucky(arg):
 			def thread():
 				try:
-					self.message_reply(message,requests.head("https://www.google.com/search?btnI=I&q="+urllib.parse.quote(arg),allow_redirects=True).url)
+					self.message_reply(message,requests.head("https://www.google.com/search?btnI=I&q=%s" % (urllib.parse.quote(arg),),allow_redirects=True).url)# TODO: Use the requests builtin parameter escape
 				except:
 					self.message_reply(message,"Kunde inte nu.. Men prova senare kanske!")
 			threading.Thread(target=thread).start()
@@ -103,7 +103,7 @@ class TesutoBot(object):
 			self.message_reply(message,resurrected_name_gen.generate_name(length,exclude).title())
 			return True
 		def to_morse(arg):
-			self.message_reply(message,"```"+util.string_char_translate(arg.upper(),morse.table)+"```")
+			self.message_reply(message,"```%s```" % (util.string_char_translate(arg.upper(),morse.table),))
 			return True
 		def full_datetime(arg):
 			self.message_reply(message,datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S\n*%A* v %W*, dag *%j* på året"))
@@ -127,7 +127,7 @@ class TesutoBot(object):
 			dices = [random.randint(1,faces) for i in range(count)]
 
 			# Print the dice states
-			self.message_reply(message,"*"+str(sum(dices))+"* / "+str(count*faces)+" : ["+("] [".join(map(str,dices)))+"]")
+			self.message_reply(message,"*%d* / %d : [%s]" % (sum(dices),count*faces,"] [".join(map(str,dices))))
 			return True
 		def vasttrafik_hallplats(arg):
 			# Check whether initialization of vasttrafik succeeded
@@ -223,7 +223,7 @@ class TesutoBot(object):
 			'google'       : google_ifeellucky,
 			'namn'         : generate_name,
 			'morse'        : to_morse,
-			'yt'           : lambda arg: echo("<https://www.youtube.com/results?search_query="+urllib.parse.quote(arg)+"|Search: *"+arg+"* - YouTube>"),
+			'yt'           : lambda arg: echo("<https://www.youtube.com/results?search_query=%s|Search: *%s* - YouTube>" % (urllib.parse.quote(arg),arg)),
 			'date'         : full_datetime,
 			'time'         : full_datetime,
 			'datum'        : full_datetime,

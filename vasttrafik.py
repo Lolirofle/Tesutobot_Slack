@@ -28,10 +28,10 @@ class Vasttrafik:
 		'''Perform a query on the method with the given parameters.'''
 		# Make request, and get a response
 		response = requests.get(
-			"https://api.vasttrafik.se/bin/rest.exe/v2/"+method,
+			"https://api.vasttrafik.se/bin/rest.exe/v2/%s" % method,
 			params=dict({'format': 'json'},**params),
 			headers={
-				'Authorization': 'Bearer '+self.access_token
+				'Authorization': 'Bearer %s' % self.access_token
 			}
 		)
 
