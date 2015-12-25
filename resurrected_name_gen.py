@@ -71,6 +71,8 @@ def generate_name(length=6,exclude=set()):
 				# Handle the consonant count
 				if c in consonants:
 					consonant_count+= 1
+				else:
+					consonant_count = 0
 			else:
 				break
 

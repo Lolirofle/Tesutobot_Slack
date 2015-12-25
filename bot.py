@@ -95,7 +95,7 @@ class TesutoBot(object):
 
 			# Try to convert the arguments to valid input data to the name generator
 			try:
-				length  = max(min(int(args[0]),10),3) if argn>0 else 6
+				length  = max(min(int(args[0]),20),3) if argn>0 else 6
 				exclude = set(args[1]) if argn>1 else set()
 			except:
 				return False
@@ -210,7 +210,6 @@ class TesutoBot(object):
 					self.hangman = None
 			else:# TODO: set art <bool>, lives <uint>
 				self.message_reply(message,"*Möjliga kommandon för hänga gubbe:*\nguess, new, reveal, show|state, help|?")
-				# https://sv.wiktionary.org/wiki/Special:RandomInCategory/Svenska/(Alla_uppslag|Adverb|Adjektiv|Verb|Substantiv)
 			return True
 		def shutdown(arg):
 			raise ShutdownReason("Shutdown command: %s %s" % (command,arg))# TODO: issued by whom? at what time and date?
@@ -218,6 +217,7 @@ class TesutoBot(object):
 		# List of commands
 		commands = {
 			'help'         : help,
+			'hjälp'        : help,
 			'choice'       : choice,
 			'choose'       : choice,
 			'välj'         : choice,
@@ -226,11 +226,15 @@ class TesutoBot(object):
 			'fel'          : lambda arg: False,
 			'false'        : lambda arg: False,
 			'vad'          : lambda arg: echo(", ".join(commands.keys())),
+			'commands'    : lambda arg: echo(", ".join(commands.keys())),
 			'kommandon'    : lambda arg: echo(", ".join(commands.keys())),
+			'echo'          : echo,
+			'say'          : echo,
 			'säg'          : echo,
 			'wiki'         : wikipedia_summary,
 			'google'       : google_ifeellucky,
 			'namn'         : generate_name,
+			'name'         : generate_name,
 			'morse'        : to_morse,
 			'yt'           : lambda arg: echo("<https://www.youtube.com/results?search_query=%s|Search: *%s* - YouTube>" % (urllib.parse.quote(arg),arg)),
 			'date'         : full_datetime,
@@ -238,8 +242,9 @@ class TesutoBot(object):
 			'datum'        : full_datetime,
 			'tid'          : full_datetime,
 			'dice'         : dice,
-			'roll'         : dice,
 			'tärning'      : dice,
+			'roll'         : dice,
+			'rulla'        : dice,
 			'baklänges'    : lambda arg: echo(arg[::-1]),
 			'ord-baklänges': lambda arg: echo(" ".join(arg.split(" ")[::-1])),
 			'hangman'      : hangman_game,
