@@ -48,7 +48,7 @@ class TesutoBot(object):
 			# Is this a question?
 			if text.endswith("?"):# TODO: Check for "hur" and filter some answers
 				# Answers to questions
-				self.message_reply(message,random.choice(["Vet inte","Relativt","Hmm..","Beror på","...","Sluta","Var inte sådan nu"]))
+				self.message_reply(message,random.choice(["Vet inte","Hmm..","Beror på","...","Sluta","Var inte sådan nu"]))
 			else:
 				# Comments on stuff that can be said
 				self.message_reply(message,"%s? %s" % (text,random.choice(["Okej","mm","ok","Jaså?","bra"])))
@@ -188,8 +188,17 @@ class TesutoBot(object):
 					else:
 						self.message_reply(message,"Ingen gissning?")
 			elif subcommand=='new':
-				self.hangman = hangman.Hangman(arg.lower() if arg else "test")
-				self.message_reply(message,"```%s```" % str(self.hangman))
+				if arg:
+					self.hangman = hangman.Hangman(arg.lower().replace('_',' '))
+					self.message_reply(message,"```%s```" % str(self.hangman))
+				else:
+					def thread():
+						try:
+							self.hangman = hangman.Hangman(wiktsv_random_word().lower())
+							self.message_reply(message,"```%s```" % str(self.hangman))
+						except Exception as e:
+							self.message_reply(message,"Kunde inte välja fras på grund av %s, så välj själv" % (type(e).__name__,))
+					threading.Thread(target=thread).start()
 			elif subcommand=='show' or subcommand=='state':
 				self.message_reply(message,"```%s```" % str(self.hangman))
 			elif subcommand=='reveal':
@@ -254,3 +263,12 @@ class TesutoBot(object):
 
 class ShutdownReason(Exception):
 	pass
+
+def wiktsv_random_word():
+	url = requests.head("https://sv.wiktionary.org/wiki/Special:RandomInCategory/Svenska/%s" % (random.choice(['Adverb','Adjektiv','Verb','Substantiv']),),allow_redirects=True).url
+	if url.startswith('https://sv.wiktionary.org/wiki/'):
+		url = url[31:]
+		if '/' in url:
+			raise Exception# TODO: Specify what kind
+		return urllib.parse.unquote(url)
+	raise Exception# TODO: Specify what kind

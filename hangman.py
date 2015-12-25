@@ -154,18 +154,18 @@ class Hangman(object):
 		self.restart()
 
 	def __str__(self):
-		return "%s\n%s (%s)" % (ascii_art[self.lives],' '.join(self.gamestate),''.join(self.guesses))
+		return "%s\n%s (%s)" % (ascii_art[self.lives],self.gamestate if self.unrevealed==0 else ' '.join(self.gamestate),''.join(self.guesses))
 
 	def build_gamestate(self):# TODO: An alternative may be to use a list of chars. Strings are immutable, but lists are not
 		self.gamestate = ''
-		unrevealed = 0
+		self.unrevealed = 0
 		for c in self.word:# I sure hope this is a hashed O(1) operation
 			if c in self.guesses or not c.isalpha():
 				self.gamestate+= c
 			else:
 				self.gamestate+= '_'
-				unrevealed+= 1
-		return unrevealed
+				self.unrevealed+= 1
+		return self.unrevealed
 
 	def guess_char(self,c):
 		'''
@@ -176,14 +176,14 @@ class Hangman(object):
 		Returns whether the game is completed (with a victory).
 		Raises a GameOverError when loses.
 		'''
-		if self.lives<=0:
-			raise GameOverError
 
 		self.guesses.add(c);
 		if c in self.word_chars:
 			return self.build_gamestate()==0
 		else:
 			self.lives-= 1
+			if self.lives<=0:
+				raise GameOverError
 			return False
 
 	def guess_str(self,s):
