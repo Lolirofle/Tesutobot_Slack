@@ -8,7 +8,8 @@ class Vasttrafik:
 		self.fetch_id_func = fetch_id_func
 		self.request_tokens()
 
-	def request_tokens(self):
+	def request_tokens(self):# TODO: Maybe there is a better way? I am not too familiar with it
+		'''Handles OAuth, receiving a access token '''
 		response = requests.post(
 			"https://api.vasttrafik.se/token",
 			data={'grant_type': 'client_credentials'},
@@ -22,10 +23,10 @@ class Vasttrafik:
 		self.expire_time  = datetime.datetime.now() + datetime.timedelta(seconds=int(response['expires_in']))
 
 	def query(self,method,params={}):
+		'''Perform a query on the method with the given parameters.'''
 		if datetime.datetime.now() > self.expire_time:
 			request_tokens()
 
-		'''Perform a query on the method with the given parameters.'''
 		# Make request, and get a response
 		response = requests.get(
 			"https://api.vasttrafik.se/bin/rest.exe/v2/%s" % method,

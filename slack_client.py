@@ -52,10 +52,10 @@ class Server(bot.TesutoBot):
 				if message['type']=="message" and 'text' in message and 'user' in message:
 					# Notification to the bot from someone?
 					if message['text'].startswith(self_id):
-						self.on_message(message,''.join(itertools.drop_while(lambda c: not c.isalnum(),message['text'][self_id_len:])))
+						self.on_message(message,''.join(itertools.dropwhile(lambda c: not c.isalnum(),message['text'][self_id_len:])))
 					# Mentioned name of the bot?
 					elif message['text'].startswith(self_name):
-						self.on_message(message,''.join(itertools.drop_while(lambda c: not c.isalnum(),message['text'][self_name_len:])))
+						self.on_message(message,''.join(itertools.dropwhile(lambda c: not c.isalnum(),message['text'][self_name_len:])))
 					# Private message from someone?
 					elif message['channel'].startswith("D") and message['user']!=self.data['self']['id']:
 						self.on_private_message(message)
