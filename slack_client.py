@@ -66,7 +66,10 @@ class Server(bot.TesutoBot):
 		self.connected = False
 
 	def message_reply(self,message,text):
-		self.slack.chat.post_message(message['channel'],"<@"+message['user']+">: "+text,as_user=True)
+		if message['channel'].startswith("D"):
+			self.slack.chat.post_message(message['channel'],text,as_user=True)
+		else:
+			self.slack.chat.post_message(message['channel'],"<@"+message['user']+">: "+text,as_user=True)
 
 class SlackNotConnectedError(Exception):
 	pass
