@@ -76,8 +76,9 @@ class TesutoBot(object):
 					self.message_reply(message,"%s\n>>>%s" % (random.choice(["Tvetydigt","Var tydligare!","Vilket menar du?"]),str(e)))
 				except wikipedia.PageError:
 					self.message_reply(message,random.choice(["En sådan artikel existerar inte!","Det där.. kunde inte hittas","Säker på att det där ens existerar?"]))
-				except:
+				except Exception as e:
 					self.message_reply(message,"Kunde inte nu.. Men prova senare kanske!")
+					traceback.print_tb(e.__traceback__)
 			threading.Thread(target=thread).start()
 			return True
 		def google_ifeellucky(arg):
@@ -95,7 +96,7 @@ class TesutoBot(object):
 
 			# Try to convert the arguments to valid input data to the name generator
 			try:
-				length  = max(min(int(args[0]),20),3) if argn>0 else 6
+				length  = max(min(int(args[0]),20),3) if arg and argn>0 else 6
 				exclude = set(args[1]) if argn>1 else set()
 			except:
 				return False
@@ -118,7 +119,7 @@ class TesutoBot(object):
 
 			# Try to convert the arguments to integers with bounds
 			try:
-				count = max(min(int(args[0]),10),1) if argn>0 else 1
+				count = max(min(int(args[0]),10),1) if arg and argn>0 else 1
 				faces = max(min(int(args[1]),100000),1) if argn>1 else 6
 			except:
 				return False
@@ -165,6 +166,7 @@ class TesutoBot(object):
 					self.message_reply(message,"Hållplats *%s*\n```%s```" % (location['name'],"\n".join(map(map_departure,self.vasttrafik.departures(location['id'],datetime.datetime.now())))))
 				except Exception as e:
 					self.message_reply(message,"Förväntade mig att få en tidtabell på hållplatsen, men fick istället en %s" % (type(e).__name__,))
+					traceback.print_tb(e.__traceback__)
 			threading.Thread(target=thread).start()
 			return True
 		def hangman_game(arg):
@@ -198,6 +200,7 @@ class TesutoBot(object):
 							self.message_reply(message,"```%s```" % str(self.hangman))
 						except Exception as e:
 							self.message_reply(message,"Kunde inte välja fras på grund av %s, så välj själv" % (type(e).__name__,))
+							traceback.print_tb(e.__traceback__)
 					threading.Thread(target=thread).start()
 			elif subcommand=='show' or subcommand=='state':
 				self.message_reply(message,"```%s```" % str(self.hangman))
