@@ -85,8 +85,9 @@ class TesutoBot(object):
 			def thread():
 				try:
 					self.message_reply(message,requests.head("https://www.google.com/search?btnI=I&q=%s" % (urllib.parse.quote(arg),),allow_redirects=True).url)# TODO: Use the requests builtin parameter escape
-				except:
+				except Exception as e:
 					self.message_reply(message,"Kunde inte nu.. Men prova senare kanske!")
+					traceback.print_tb(e.__traceback__)
 			threading.Thread(target=thread).start()
 			return True
 		def generate_name(arg):
@@ -97,11 +98,15 @@ class TesutoBot(object):
 			# Try to convert the arguments to valid input data to the name generator
 			try:
 				length  = max(min(int(args[0]),20),3) if arg and argn>0 else 6
-				exclude = set(args[1]) if argn>1 else set()
+				exclude = set(args[1]) if argn>1 else set('qxzåäö')
 			except:
 				return False
 
-			self.message_reply(message,resurrected_name_gen.generate_name(length,exclude).title())
+			try:
+				self.message_reply(message,resurrected_name_gen.generate_name(length,exclude).title())
+			except Exception as e:
+				self.message_reply(message,"Kunde inte generera ett namn...")
+				traceback.print_tb(e.__traceback__)
 			return True
 		def to_morse(arg):
 			self.message_reply(message,"```%s```" % (util.string_char_translate(arg.upper(),morse.table),))
@@ -178,12 +183,24 @@ class TesutoBot(object):
 					if arg:
 						if arg[0].isalpha():
 							try:
-								has_won = self.hangman.guess_char(arg[0].lower())
-								self.message_reply(message,"```%s```" % str(self.hangman))
-								if has_won:
+								guess = arg[0].lower()
+								guess_state = self.hangman.guess_char(guess)
+								if self.hangman.is_complete():
+									self.message_reply(message,"```%s```\nTotalt %d gissningar (%d fel)" % (
+										str(self.hangman),
+										len(self.hangman.guesses),
+										self.hangman.initial_lives - self.hangman.lives,
+									))
 									self.hangman = None
+								else:
+									self.message_reply(message,"```%s```\n _%s_ var *%s* (Liv: %d)" % (
+										str(self.hangman),
+										guess,
+										"rätt" if guess_state==True else "fel" if guess_state==False else "redan gissat",
+										self.hangman.lives
+									))
 							except hangman.GameOverError:
-								self.message_reply(message,"Tyvärr, det var: %s" % self.hangman.word)
+								self.message_reply(message,"Tyvärr, det var: %s" % (self.hangman.word,))
 								self.hangman = None
 						else:
 							self.message_reply(message,"Kan bara gissa med bokstäver ur alfabetet!")
@@ -196,14 +213,17 @@ class TesutoBot(object):
 				else:
 					def thread():
 						try:
-							self.hangman = hangman.Hangman(wiktsv_random_word().lower())
+							self.hangman = hangman.Hangman(wiktsv_random_word().lower().replace('_',' '))
 							self.message_reply(message,"```%s```" % str(self.hangman))
 						except Exception as e:
 							self.message_reply(message,"Kunde inte välja fras på grund av %s, så välj själv" % (type(e).__name__,))
 							traceback.print_tb(e.__traceback__)
 					threading.Thread(target=thread).start()
 			elif subcommand=='show' or subcommand=='state':
-				self.message_reply(message,"```%s```" % str(self.hangman))
+				if self.hangman==None:
+					self.message_reply(message,"Kör inget. Vill spela, eller?")
+				else:
+					self.message_reply(message,"```%s```" % str(self.hangman))
 			elif subcommand=='reveal':
 				if self.hangman==None:
 					self.message_reply(message,"Kör inget. Vill spela, eller?")
@@ -229,9 +249,9 @@ class TesutoBot(object):
 			'fel'          : lambda arg: False,
 			'false'        : lambda arg: False,
 			'vad'          : lambda arg: echo(", ".join(commands.keys())),
-			'commands'    : lambda arg: echo(", ".join(commands.keys())),
+			'commands'     : lambda arg: echo(", ".join(commands.keys())),
 			'kommandon'    : lambda arg: echo(", ".join(commands.keys())),
-			'echo'          : echo,
+			'echo'         : echo,
 			'say'          : echo,
 			'säg'          : echo,
 			'wiki'         : wikipedia_summary,

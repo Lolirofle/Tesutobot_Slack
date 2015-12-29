@@ -39,45 +39,42 @@ vowels     = set('aoueiyåäö')
 consonants = set('qwrtpsdfghjklzxcvbnm')
 
 def generate_name(length=6,exclude=set()):
-	try:
-		# First character
-		name = random.choice(list(initial.difference(exclude)))
+	# First character
+	name = random.choice(list(initial.difference(exclude)))
 
-		# Second character (Only if the first is a consonant, and this is then a vowel)
-		if name[0] in consonants:
-			name+= random.choice(list(vowels.difference(exclude)))
+	# Second character (Only if the first is a consonant, and this is then a vowel)
+	if name[0] in consonants:
+		name+= random.choice(list(vowels.difference(exclude)))
 
-		# State for number of consonants after each other
-		consonant_count = 0
+	# State for number of consonants after each other
+	consonant_count = 0
 
-		# Generates pseudo-randomly new letters
-		for i in range(len(name),length):
-			# States
-			previous_c = name[-1]
-			c = ''
+	# Generates pseudo-randomly new letters
+	for i in range(len(name),length):
+		# States
+		previous_c = name[-1]
+		c = ''
 
-			# Potential character for the next position
-			potential_cs = combinations[previous_c].difference(exclude)
+		# Potential character for the next position
+		potential_cs = combinations[previous_c].difference(exclude)
 
-			# Disallow a specific number of consonants after each other
-			if consonant_count==2:
-				potential_cs = potential_cs.difference(consonants)
+		# Disallow a specific number of consonants after each other
+		if consonant_count==2:
+			potential_cs = potential_cs.difference(consonants)
 
-			# Check if there are any potential characters at all
-			if potential_cs:
-				# Choose a random character from the list of potential characters
-				c = random.choice(list(potential_cs))
+		# Check if there are any potential characters at all
+		if potential_cs:
+			# Choose a random character from the list of potential characters
+			c = random.choice(list(potential_cs))
 
-				# Handle the consonant count
-				if c in consonants:
-					consonant_count+= 1
-				else:
-					consonant_count = 0
+			# Handle the consonant count
+			if c in consonants:
+				consonant_count+= 1
 			else:
-				break
+				consonant_count = 0
+		else:
+			break
 
-			# Append the character to the name
-			name+= c
-		return name
-	except:
-		return ""
+		# Append the character to the name
+		name+= c
+	return name

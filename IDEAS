@@ -8,9 +8,11 @@ Kommandon med hjälp av fin syntax
 Skriva "Är något på tok?"/"Är det dags igen?" när man börjar skriva privat meddelande till den
 Anteckningar genom lagring av data (@tesutobot data x=5 -> OK) (@tesutobot data x -> 5)
 Alarm/påminnelser/timer
-Intervallräkning mellan tider/datum
+Intervallräkning mellan tider/datum (@tesutobot dagar till|tills|från julafton)
 Vädret
 Tid på en tidszon
 Urban dictionary
 Röstning
 Hänga gubbe med ord som har skrivits i chatten
+@tesutobot säg (Jag vet inte) på|i #bot om|efter 20 minuter (använd threading.Timer)
+@tesutobot säg Jag vet inte

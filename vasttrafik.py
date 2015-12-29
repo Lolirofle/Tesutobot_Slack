@@ -22,10 +22,10 @@ class Vasttrafik:
 		self.access_token = response['access_token']
 		self.expire_time  = datetime.datetime.now() + datetime.timedelta(seconds=int(response['expires_in']))
 
-	def query(self,method,params={}):
+	def query(self,method,params={},retry_on_unauthorized=True):
 		'''Perform a query on the method with the given parameters.'''
 		if datetime.datetime.now() > self.expire_time:
-			request_tokens()
+			self.request_tokens()
 
 		# Make request, and get a response
 		response = requests.get(
@@ -39,7 +39,11 @@ class Vasttrafik:
 		# Eventual errors
 		if response.status_code!=200:
 			if response.status_code==401:
-				raise VasttrafikUnauthorizedError(response)
+				if retry_on_unauthorized:
+					self.request_tokens()
+					self.query(method,params,False)
+				else:
+					raise VasttrafikUnauthorizedError(response)
 			elif response.status_code==500:
 				raise VasttrafikInternalServerError(response)
 			else:
