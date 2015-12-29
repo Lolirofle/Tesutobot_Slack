@@ -17,6 +17,7 @@ import wikipedia
 # Full name: てすと﻿ＴＥＳＵＴＯ , ぼと
 # Purpose: ＴＩＬＬ  ＦÖＲ  ＡＴＴ  ＴＥＳＴＡ  ＳＡＫＥＲ～
 
+
 class TesutoBot(object):
 	''' Abstract class/mixin, implementing a number of methods '''
 
@@ -177,7 +178,7 @@ class TesutoBot(object):
 		def hangman_game(arg):
 			(subcommand,arg) = util.string_split_when(lambda c: c.isspace(),arg)
 			if subcommand=='guess':
-				if self.hangman==None:
+				if self.hangman is None:
 					self.message_reply(message,"Kör inget. Vill spela, eller?")
 				else:
 					if arg:
@@ -196,7 +197,7 @@ class TesutoBot(object):
 									self.message_reply(message,"```%s```\n _%s_ var *%s* (Liv: %d)" % (
 										str(self.hangman),
 										guess,
-										"rätt" if guess_state==True else "fel" if guess_state==False else "redan gissat",
+										"rätt" if guess_state is True else "fel" if guess_state is False else "redan gissat",
 										self.hangman.lives
 									))
 							except hangman.GameOverError:
@@ -220,12 +221,12 @@ class TesutoBot(object):
 							traceback.print_tb(e.__traceback__)
 					threading.Thread(target=thread).start()
 			elif subcommand=='show' or subcommand=='state':
-				if self.hangman==None:
+				if self.hangman is None:
 					self.message_reply(message,"Kör inget. Vill spela, eller?")
 				else:
 					self.message_reply(message,"```%s```" % str(self.hangman))
 			elif subcommand=='reveal':
-				if self.hangman==None:
+				if self.hangman is None:
 					self.message_reply(message,"Kör inget. Vill spela, eller?")
 				else:
 					self.hangman.reveal()
@@ -289,8 +290,10 @@ class TesutoBot(object):
 			# Not a command
 			return False
 
+
 class ShutdownReason(Exception):
 	pass
+
 
 def wiktsv_random_word():
 	url = requests.head("https://sv.wiktionary.org/wiki/Special:RandomInCategory/Svenska/%s" % (random.choice(['Adverb','Adjektiv','Verb','Substantiv']),),allow_redirects=True).url

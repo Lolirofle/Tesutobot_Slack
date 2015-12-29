@@ -16,3 +16,4 @@ Röstning
 Hänga gubbe med ord som har skrivits i chatten
 @tesutobot säg (Jag vet inte) på|i #bot om|efter 20 minuter (använd threading.Timer)
 @tesutobot säg Jag vet inte
+requests timeout? http://docs.python-requests.org/en/latest/user/quickstart/#timeouts (Vad är standardvärdet?)

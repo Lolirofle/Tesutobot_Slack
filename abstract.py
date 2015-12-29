@@ -10,6 +10,7 @@ class Bot(object):
 	def on_command(self,message,command,arg):
 		raise NotImplementedError
 
+
 class Client(object):
 	''' Abstracts a client '''
 
@@ -19,6 +20,7 @@ class Client(object):
 		Implemented by a client.
 		'''
 		raise NotImplementedError
+
 
 class Message(object):
 	''' Abstracts a message '''

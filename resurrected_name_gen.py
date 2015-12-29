@@ -38,6 +38,7 @@ initial    = set('wfpgylujarstdhneiocvbkm')
 vowels     = set('aoueiyåäö')
 consonants = set('qwrtpsdfghjklzxcvbnm')
 
+
 def generate_name(length=6,exclude=set()):
 	# First character
 	name = random.choice(list(initial.difference(exclude)))

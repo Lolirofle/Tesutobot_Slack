@@ -2,6 +2,7 @@ import datetime
 import requests
 import urllib
 
+
 class Vasttrafik:
 	def __init__(self,fetch_id_func):
 		self.cached_locations = {}
@@ -81,28 +82,41 @@ class Vasttrafik:
 		if 'error' in data or 'errorText' in data:
 			raise VasttrafikOnMethodError(data['error'],data['errorText'])
 
+
 class VasttrafikError(Exception):
 	pass
+
+
 class VasttrafikNoSuchLocation(Exception):
 	def __init__(self,location_name):
 		self.location_name = location_name
 	def __str__(self):
 		return repr(self.location_name)
+
+
 class VasttrafikOnMethodError(Exception):
 	def __init__(self,error,error_text):
 		self.error = error
 		self.error_text = error_text
 	def __str__(self):
 		return repr(self.error_text)
+
+
 class VasttrafikResponseError(VasttrafikError):
 	def __init__(self,response):
 		self.response = response
 	def __str__(self):
 		return repr(self.response)
+
+
 class VasttrafikInternalServerError(VasttrafikResponseError):
 	pass
+
+
 class VasttrafikUnauthorizedError(VasttrafikResponseError):
 	pass
+
+
 class VasttrafikWrongContentTypeError(VasttrafikResponseError):
 	def __str__(self):
 		return repr(self.response.headers['content-type'])

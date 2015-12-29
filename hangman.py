@@ -145,6 +145,7 @@ ascii_art = (
 	"             ",
 )
 
+
 class Hangman(object):
 	def __init__(self,word,lives=12):
 		self.initial_lives = 12 # TODO: Implement an arbitrary number of lives
@@ -186,7 +187,7 @@ class Hangman(object):
 		if c in self.guesses:
 			return None
 		else:
-			self.guesses.add(c);
+			self.guesses.add(c)
 			if c in self.word_chars:
 				self.build_gamestate()
 				return True
@@ -212,6 +213,7 @@ class Hangman(object):
 	def is_complete(self):
 		''' Returns whether the game is completed (all characters are revealed => ..with a victory) '''
 		return self.unrevealed==0
+
 
 class GameOverError(Exception):
 	pass

@@ -5,6 +5,7 @@ import websocket
 import bot
 import util
 
+
 class Server(bot.TesutoBot):
 	def __init__(self,slack):
 		self.slack = slack
@@ -73,8 +74,11 @@ class Server(bot.TesutoBot):
 			as_user=True
 		)
 
+
 class SlackNotConnectedError(Exception):
 	pass
+
+
 class SlackRtmConnectionError(Exception):
 	def __init__(self,error):
 		self.error = error
