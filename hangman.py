@@ -147,8 +147,8 @@ ascii_art = (
 
 
 class Hangman(object):
-	def __init__(self,word,lives=12):
-		self.initial_lives = 12 # TODO: Implement an arbitrary number of lives
+	def __init__(self,word,lives=len(ascii_art),valid_char_predicate=str.isalpha):
+		self.initial_lives = lives
 		self.word = word
 		self.word_chars = set(word)
 
@@ -162,29 +162,36 @@ class Hangman(object):
 
 	def __str__(self):
 		''' Default string representation of the game '''
-		return "%s\n%s (%s)" % (ascii_art[self.lives],self.gamestate if self.unrevealed==0 else ' '.join(self.gamestate),''.join(self.guesses))
+		return "%s\n%s (%s)" % (
+			ascii_art[int(self.lives/self.initial_lives * (len(ascii_art)-1))],
+			self.gamestate if self.unrevealed==0 else ' '.join(self.gamestate),
+			','.join(self.guesses)
+		)
 
 	def build_gamestate(self):# TODO: An alternative may be to use a list of chars. Strings are immutable, but lists are not
 		self.gamestate = ''
 		self.unrevealed = 0
 		for c in self.word:# I sure hope this is a hashed O(1) operation
-			if c in self.guesses or not c.isalpha():
+			if c in self.guesses or not self.valid_char_predicate(c):
 				self.gamestate+= c
 			else:
 				self.gamestate+= '_'
 				self.unrevealed+= 1
 
-	def guess_char(self,c):
+	def guess_char(self,c):# TODO: Invalid characters
 		'''
 		Guess using a character,
-		adding it to the guess list and
-		revealing the character in the gamestate if the word contained it.
+		adding it to the guess list and revealing the character in the gamestate if the word contained it.
+		This counts as one guess if the character was not already guessed.
 
 		Returns a boolean for whether the guess was correct or None if the letter already have been guessed.
-		Raises a GameOverError when loses.
+		Raises a GameOverError when loses (lives<=0).
+		Raises a InvalidCharError when the given character was invalid.
 		'''
 
-		if c in self.guesses:
+		if not self.valid_char_predicate(c):
+			raise InvalidCharError(c)
+		elif c in self.guesses:
 			return None
 		else:
 			self.guesses.add(c)
@@ -198,7 +205,53 @@ class Hangman(object):
 				return False
 
 	def guess_str(self,s):
-		pass
+		'''
+		Guess using a whole string,
+		adding all characters if the word contained the exact string given and reveals them in the gamestate.
+		This always counts as one guess.
+
+		Returns a boolean for whether the guess was correct.
+		Raises a GameOverError when loses (lives<=0).
+		'''
+		if self.word.find(s)>=0:
+			for c in s:
+				self.guesses.add(c)
+			self.build_gamestate()
+			return True
+		else:
+			self.lives-= 1
+			if self.lives<=0:
+				raise GameOverError
+			return False
+
+	def guess_chars(self,s):
+		'''
+		Guess using a list of characters (e.g. a string),
+		adding the ones the word contained to the guess list and revealing them in the gamestate.
+		Each character that has not already been guessed counts as one guess.
+
+		Returns a map which maps the given characters to True, False or None (See `guess_char`)
+		Raises a GameOverError when loses (lives<=0).
+		Raises a InvalidCharError when one or more of the the given characters was invalid.
+		'''
+
+		mapping = {}
+		for c in s:
+			if not self.valid_char_predicate(c):
+				raise InvalidCharError(c)
+			elif c in self.guesses:
+				mapping[c] = None
+			else:
+				self.guesses.add(c)
+				if c in self.word_chars:
+					mapping[c] = True
+				else:
+					self.lives-= 1
+					mapping[c] = False
+		self.build_gamestate()
+		if self.lives<=0:
+			raise GameOverError
+		return mapping
 
 	def restart(self):
 		''' Resets the lives and guesses, using the same word '''
@@ -218,11 +271,18 @@ class Hangman(object):
 class GameOverError(Exception):
 	pass
 
+
+class InvalidCharError(Exception):
+	def __init__(self,char):
+		self.char = char
+
 # Testing it in the terminal
 #hangman = Hangman("test")
 #print(str(hangman))
 #for line in sys.stdin:
 #	try:
+#		#guess = hangman.guess_str(line[:-1])
+#		#guess = hangman.guess_chars(line[:-1])
 #		guess = hangman.guess_char(line[0])
 #		print(str(hangman))
 #
